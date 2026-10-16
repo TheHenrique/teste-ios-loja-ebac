@@ -1,4 +1,5 @@
 import path from 'path'
+import { prepararCompra } from './test/support/loja.api.js'
 
 // Capacidades para rodar no simulador de iPhone (macOS + Xcode)
 const simulador = {
@@ -80,6 +81,10 @@ export const config = {
     mochaOpts: {
         ui: 'bdd',
         timeout: 900000
+    },
+    // Massa de teste pela API, antes de abrir o app: carrinho vazio e um produto novo, com estoque
+    beforeSession: async function () {
+        process.env.PRODUTO_TESTE = await prepararCompra()
     },
     // Mesmo ajuste do 'appium:waitForIdleTimeout', aplicado também depois que a sessão abre
     before: async function () {
