@@ -1,0 +1,42 @@
+name: Testes iOS na BrowserStack
+
+on:
+  push:
+    branches: [ci]
+  workflow_dispatch:
+
+jobs:
+  testes:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Baixar o projeto
+        uses: actions/checkout@v7
+
+      - name: Configurar o Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22
+
+      - name: Instalar as dependências
+        run: npm ci
+
+      - name: Baixar o app LojaEBAC.ipa
+        run: curl -L -o LojaEBAC.ipa https://github.com/EBAC-QE/ebac-store-mobile-tests/raw/ios/app/LojaEBAC.ipa
+
+      - name: Enviar o app para a BrowserStack
+        env:
+          BROWSERSTACK_USERNAME: ${{ secrets.BROWSERSTACK_USERNAME }}
+          BROWSERSTACK_ACCESS_KEY: ${{ secrets.BROWSERSTACK_ACCESS_KEY }}
+        run: |
+          APP_URL=$(curl -s -u "$BROWSERSTACK_USERNAME:$BROWSERSTACK_ACCESS_KEY" \
+            -X POST "https://api-cloud.browserstack.com/app-automate/upload" \
+            -F "file=@LojaEBAC.ipa" | jq -r .app_url)
+          echo "App enviado: $APP_URL"
+          echo "BROWSERSTACK_APP_URL=$APP_URL" >> $GITHUB_ENV
+
+      - name: Rodar os testes na BrowserStack
+        env:
+          BROWSERSTACK_USERNAME: ${{ secrets.BROWSERSTACK_USERNAME }}
+          BROWSERSTACK_ACCESS_KEY: ${{ secrets.BROWSERSTACK_ACCESS_KEY }}
+        run: npm test

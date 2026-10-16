@@ -22,23 +22,51 @@ const sauceLabs = {
     }
 }
 
-const usarSauce = process.env.SAUCE_USERNAME && process.env.SAUCE_ACCESS_KEY
+// Capacidades para rodar em iPhone real na BrowserStack (BROWSERSTACK_APP_URL vem do upload do LojaEBAC.ipa)
+const browserStack = {
+    platformName: 'iOS',
+    'appium:deviceName': 'iPhone 15',
+    'appium:platformVersion': '17',
+    'appium:automationName': 'XCUITest',
+    'appium:app': process.env.BROWSERSTACK_APP_URL,
+    'bstack:options': {
+        projectName: 'Loja EBAC iOS',
+        buildName: 'Checkout iOS - GitHub Actions',
+        sessionName: 'Fluxo de checkout'
+    }
+}
 
-export const config = {
-    runner: 'local',
-    ...(usarSauce
-        ? {
+function conexao() {
+    if (process.env.BROWSERSTACK_USERNAME) {
+        return {
+            user: process.env.BROWSERSTACK_USERNAME,
+            key: process.env.BROWSERSTACK_ACCESS_KEY,
+            hostname: 'hub.browserstack.com',
+            port: 443,
+            protocol: 'https',
+            path: '/wd/hub',
+            capabilities: [browserStack]
+        }
+    }
+    if (process.env.SAUCE_USERNAME) {
+        return {
             user: process.env.SAUCE_USERNAME,
             key: process.env.SAUCE_ACCESS_KEY,
             hostname: 'ondemand.us-west-1.saucelabs.com',
             port: 443,
             protocol: 'https',
-            path: '/wd/hub'
+            path: '/wd/hub',
+            capabilities: [sauceLabs]
         }
-        : { port: 4723 }),
+    }
+    return { port: 4723, capabilities: [simulador] }
+}
+
+export const config = {
+    runner: 'local',
+    ...conexao(),
     specs: ['./test/specs/**/*.js'],
     maxInstances: 1,
-    capabilities: [usarSauce ? sauceLabs : simulador],
     logLevel: 'info',
     waitforTimeout: 15000,
     connectionRetryTimeout: 120000,
