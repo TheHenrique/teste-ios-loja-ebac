@@ -1,21 +1,24 @@
 import { $ } from '@wdio/globals'
 
 class CartPage {
-    get botaoNovoEndereco() { return $('~addNewAddress') }
+    get botaoContinuar() { return $('~selectAddressOrContinueToPayment') }
     get enderecoSelecionado() { return $('~addressName') }
-    get botaoContinuarPagamento() { return $('~selectAddressOrContinueToPayment') }
+    get botaoNovoEndereco() { return $('~addNewAddress') }
 
-    async aguardarCarrinho() {
-        await this.botaoContinuarPagamento.waitForDisplayed({ timeout: 30000 })
+    // Espera o carrinho abrir e dá um tempo para os endereços do usuário carregarem
+    async possuiEndereco() {
+        await this.botaoContinuar.waitForDisplayed()
+        return this.enderecoSelecionado.waitForDisplayed({ timeout: 15000 }).then(() => true, () => false)
     }
 
-    async possuiEndereco() {
-        return await this.enderecoSelecionado.isExisting()
+    async adicionarEndereco() {
+        await this.botaoNovoEndereco.waitForDisplayed()
+        await this.botaoNovoEndereco.click()
     }
 
     async irParaPagamento() {
-        await this.enderecoSelecionado.waitForDisplayed({ timeout: 30000 })
-        await this.botaoContinuarPagamento.click()
+        await this.enderecoSelecionado.waitForDisplayed()
+        await this.botaoContinuar.click()
     }
 }
 

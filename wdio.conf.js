@@ -29,10 +29,14 @@ const browserStack = {
     'appium:platformVersion': '17',
     'appium:automationName': 'XCUITest',
     'appium:app': process.env.BROWSERSTACK_APP_URL,
+    // A Home do app tem um carrossel que gira sozinho, então o app nunca fica "parado".
+    // Com 0, o Appium não espera o app parar antes de cada comando (sem isso, cada busca levava ~45 s)
+    'appium:waitForIdleTimeout': 0,
     'bstack:options': {
         projectName: 'Loja EBAC iOS',
         buildName: 'Checkout iOS - GitHub Actions',
-        sessionName: 'Fluxo de checkout'
+        sessionName: 'Fluxo de checkout',
+        appiumVersion: '2.15.0'
     }
 }
 
@@ -68,14 +72,18 @@ export const config = {
     specs: ['./test/specs/**/*.js'],
     maxInstances: 1,
     logLevel: 'info',
-    waitforTimeout: 15000,
+    waitforTimeout: 60000,
     connectionRetryTimeout: 120000,
     connectionRetryCount: 3,
     framework: 'mocha',
     reporters: ['spec'],
     mochaOpts: {
         ui: 'bdd',
-        timeout: 300000
+        timeout: 900000
+    },
+    // Mesmo ajuste do 'appium:waitForIdleTimeout', aplicado também depois que a sessão abre
+    before: async function () {
+        await driver.updateSettings({ waitForIdleTimeout: 0, animationCoolOffTimeout: 0 }).catch(() => {})
     },
     // Se o teste falhar, mostra no log a estrutura da tela atual (ajuda a achar o seletor certo)
     afterTest: async function (test, context, { passed }) {

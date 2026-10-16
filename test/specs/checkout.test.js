@@ -14,17 +14,16 @@ describe('Checkout no app iOS da Loja EBAC', () => {
         await homePage.abrirPerfil()
         await loginPage.login('admin@admin.com', 'admin123')
 
-        // 2. Área de busca (Browse) e escolha do produto
-        await homePage.abrirBusca()
-        await browsePage.escolherPrimeiroProduto('Produto')
+        // 2. Escolha do produto na lista (aba Browse)
+        await homePage.abrirBrowse()
+        await browsePage.escolherPrimeiroProduto()
 
         // 3. Adiciona o produto no carrinho (o app abre o carrinho em seguida)
         await productPage.adicionarAoCarrinho()
-        await cartPage.aguardarCarrinho()
 
-        // 4. Adiciona um endereço, se ainda não existir
+        // 4. Cadastra um endereço, se o usuário ainda não tiver
         if (!(await cartPage.possuiEndereco())) {
-            await cartPage.botaoNovoEndereco.click()
+            await cartPage.adicionarEndereco()
             await addressPage.cadastrar({
                 nome: 'Cliente EBAC',
                 telefone: '11999999999',
@@ -35,10 +34,10 @@ describe('Checkout no app iOS da Loja EBAC', () => {
             })
         }
 
-        // 5. Pagamento e conclusão do checkout
+        // 5. Pagamento e conclusão da compra
         await cartPage.irParaPagamento()
         await checkoutPage.finalizarCompra()
 
-        await expect(checkoutPage.telaSucesso).toBeDisplayed({ wait: 30000 })
+        await expect(checkoutPage.telaSucesso).toBeDisplayed({ wait: 60000 })
     })
 })

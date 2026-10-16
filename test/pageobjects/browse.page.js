@@ -1,24 +1,11 @@
-import { $, $$ } from '@wdio/globals'
+import { $ } from '@wdio/globals'
 
 class BrowsePage {
-    get campoBusca() { return $('~searchInput') }
-    get primeiroProduto() { return $('~productDetails') }
-    get produtos() { return $$('~productDetails') }
+    // Primeiro produto visível da lista
+    get primeiroProduto() { return $('-ios predicate string:name == "productDetails" AND visible == 1') }
 
-    async buscar(termo) {
-        await this.campoBusca.waitForDisplayed({ timeout: 30000 })
-        await this.campoBusca.setValue(termo)
-    }
-
-    // Se a lista não aparecer sozinha, faz uma busca para carregar os produtos
-    async escolherPrimeiroProduto(termo) {
-        const apareceu = await this.primeiroProduto
-            .waitForDisplayed({ timeout: 15000 })
-            .catch(() => false)
-        if (!apareceu) {
-            await this.buscar(termo)
-            await this.primeiroProduto.waitForDisplayed({ timeout: 30000 })
-        }
+    async escolherPrimeiroProduto() {
+        await this.primeiroProduto.waitForDisplayed()
         await this.primeiroProduto.click()
     }
 }
