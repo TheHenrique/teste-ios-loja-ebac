@@ -1,21 +1,24 @@
 import { $ } from '@wdio/globals'
 
-// Texto que aparece embaixo de cada aba no app
-const textoDaAba = { Home: 'Home', Browse: 'Browse', Account: 'Profile' }
-
 class HomePage {
-    // Procura a aba pelo id (tab-Browse) ou, se não achar, pelo texto que aparece na tela
-    async abrirAba(nome) {
-        const texto = textoDaAba[nome] || nome
-        const aba = $(`-ios predicate string:name == "tab-${nome}" OR (type == "XCUIElementTypeButton" AND label BEGINSWITH "${texto}")`)
-        await aba.waitForDisplayed({ timeout: 30000 })
-        await aba.click()
+    // Aba de perfil (Account/Profile) da barra inferior
+    get abaPerfil() {
+        return $('-ios predicate string:name == "tab-Account" OR label CONTAINS "Profile"')
     }
 
-    get iconeCarrinho() { return $('~cart') }
+    // Barra "Search Products" da Home, que leva para a área de busca (Browse)
+    get barraDeBusca() {
+        return $('-ios predicate string:name == "search-products" OR label CONTAINS "Search Products"')
+    }
 
-    async abrirCarrinho() {
-        await this.iconeCarrinho.click()
+    async abrirPerfil() {
+        await this.abaPerfil.waitForDisplayed({ timeout: 30000 })
+        await this.abaPerfil.click()
+    }
+
+    async abrirBusca() {
+        await this.barraDeBusca.waitForDisplayed({ timeout: 30000 })
+        await this.barraDeBusca.click()
     }
 }
 

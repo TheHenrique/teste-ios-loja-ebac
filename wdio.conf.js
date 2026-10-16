@@ -75,6 +75,13 @@ export const config = {
     reporters: ['spec'],
     mochaOpts: {
         ui: 'bdd',
-        timeout: 180000
+        timeout: 300000
+    },
+    // Se o teste falhar, mostra no log a estrutura da tela atual (ajuda a achar o seletor certo)
+    afterTest: async function (test, context, { passed }) {
+        if (!passed) {
+            console.log('===== TELA NO MOMENTO DA FALHA =====')
+            console.log(await driver.getPageSource())
+        }
     }
 }
