@@ -12,7 +12,7 @@ describe('Checkout no app iOS da Loja EBAC', () => {
     it('Deve fazer login, escolher um produto e concluir a compra', async () => {
         // 1. Login
         await homePage.abrirAba('Account')
-        await loginPage.login('cliente@ebac.art.br', 'GD*peToHNJ1#c$sgk08EaYJQ')
+        await loginPage.login('admin@admin.com', 'admin123')
 
         // 2. Área de busca (Browse) e escolha do produto
         await homePage.abrirAba('Browse')
