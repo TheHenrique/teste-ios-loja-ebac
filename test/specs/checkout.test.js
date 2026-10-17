@@ -1,5 +1,4 @@
 import { expect } from '@wdio/globals'
-import { USUARIO } from '../support/loja.api.js'
 import homePage from '../pageobjects/home.page.js'
 import loginPage from '../pageobjects/login.page.js'
 import browsePage from '../pageobjects/browse.page.js'
@@ -9,22 +8,15 @@ import addressPage from '../pageobjects/address.page.js'
 import checkoutPage from '../pageobjects/checkout.page.js'
 
 describe('Checkout no app iOS da Loja EBAC', () => {
-    let produto
-
-    // Produto criado pela API no beforeSession (wdio.conf.js), antes de o app abrir
-    before(() => {
-        produto = process.env.PRODUTO_TESTE
-        if (!produto) throw new Error('A massa de teste não foi criada pela API da loja (veja o erro no começo do log)')
-    })
 
     it('Deve fazer login, escolher um produto e concluir a compra', async () => {
         // 1. Login
         await homePage.abrirPerfil()
-        await loginPage.login(USUARIO.email, USUARIO.senha)
+        await loginPage.login('admin@admin.com', 'admin123')
 
-        // 2. Busca e escolha do produto (aba Browse)
+        // 2. Escolha do produto na lista (aba Browse)
         await homePage.abrirBrowse()
-        await browsePage.escolherProduto(produto)
+        await browsePage.escolherPrimeiroProduto()
 
         // 3. Adiciona o produto no carrinho (o app abre o carrinho em seguida)
         await productPage.adicionarAoCarrinho()
